@@ -67,12 +67,14 @@ npm install
 ### 3. Run Migrations
 
 ```bash
-# Run standard Laravel migrations
-php artisan migrate
+# Run standard Laravel migrations (these will go to admin/public schema)
+php artisan migrate --database=admin
 
-# Run admin-specific migrations
+# Run admin-specific migrations with seed data
 php artisan admin:migrate --seed
 ```
+
+**Important**: All Laravel base migrations now use the `admin` connection and create tables in the `public` schema. When new client schemas are created, these tables are copied over automatically.
 
 ### 4. Build Assets
 
@@ -160,7 +162,7 @@ The application resolves tenants via:
 
 1. Set up PostgreSQL database
 2. Configure environment variables
-3. Run migrations: `php artisan migrate && php artisan admin:migrate --seed`
+3. Run migrations: `php artisan migrate --database=admin && php artisan admin:migrate --seed`
 4. Configure web server for subdomain routing (if using subdomain tenancy)
 5. Set up SSL certificates for all domains/subdomains
 

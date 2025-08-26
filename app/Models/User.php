@@ -13,6 +13,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Note: This model uses the tenant connection when accessed via client panels.
+     * The connection is dynamically set by TenantMiddleware.
+     * For admin operations, use App\Models\Admin\AdminUser instead.
+     */
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

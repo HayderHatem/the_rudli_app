@@ -67,6 +67,7 @@ class AdminController extends Controller
             'password_reset_tokens',
             'sessions',
             'cache',
+            'cache_locks',
             'jobs',
             'job_batches',
             'failed_jobs'
@@ -74,11 +75,25 @@ class AdminController extends Controller
 
         foreach ($baseTables as $table) {
             try {
-                // Create table structure in new schema
+                // Create table structure in new schema by copying from public schema
                 DB::connection('admin')->statement("
                     CREATE TABLE IF NOT EXISTS {$schemaName}.{$table} 
                     (LIKE public.{$table} INCLUDING ALL)
                 ");
+                
+                // For users table, we might want to copy some seed data or create a default admin user
+                if ($table === 'users') {
+                    // Optionally create a default user for the tenant
+                    // This is commented out but can be enabled if needed
+                    /*
+                    DB::connection('admin')->statement("
+                        INSERT INTO {$schemaName}.users (name, email, password, created_at, updated_at)
+                        VALUES ('Admin', 'admin@{$schemaName}.local', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NOW(), NOW())
+                        ON CONFLICT (email) DO NOTHING
+                    ");
+                    */
+                }
+                
             } catch (\Exception $e) {
                 // Log error but continue with other tables
                 \Illuminate\Support\Facades\Log::warning("Failed to copy table {$table} to schema {$schemaName}: " . $e->getMessage());
